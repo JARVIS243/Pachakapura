@@ -1,10 +1,8 @@
 import streamlit as st
 import requests
 import sqlite3
+from datetime import datetime
 from deep_translator import GoogleTranslator
-from gtts import gTTS
-import tempfile
-import base64
 
 # Database setup
 conn = sqlite3.connect('recipes.db', check_same_thread=False)
@@ -17,6 +15,7 @@ cursor.execute('''CREATE TABLE IF NOT EXISTS recipes (
 )''')
 conn.commit()
 
+# Spoonacular API key
 API_KEY = "9714989c384a4a5595583c53c90db947"
 
 def fetch_recipe_from_spoonacular(ingredients):
@@ -49,26 +48,7 @@ def translate_to_malayalam(text):
         print("Translation error:", e)
         return text
 
-def speak_text(text, lang='en'):
-    try:
-        tts = gTTS(text=text, lang=lang)
-        with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as fp:
-            tts.save(fp.name)
-            audio_path = fp.name
-
-        with open(audio_path, "rb") as f:
-            audio_bytes = f.read()
-        b64_audio = base64.b64encode(audio_bytes).decode()
-        audio_html = f"""
-            <audio autoplay controls>
-                <source src="data:audio/mp3;base64,{b64_audio}" type="audio/mp3">
-                Your browser does not support the audio element.
-            </audio>
-        """
-        st.markdown(audio_html, unsafe_allow_html=True)
-    except Exception as e:
-        st.error(f"Voice error: {e}")
-
+# Streamlit UI
 st.set_page_config(page_title="Pachakapura", layout="centered")
 
 st.markdown("""
@@ -144,7 +124,6 @@ if st.button("📤 Send") and ingredients:
     with st.spinner("Typing..."):
         title, instructions, image_url = fetch_recipe_from_spoonacular(ingredients)
         if title:
-            speak_lang = 'ml' if language == "Malayalam" else 'en'
             if language == "Malayalam":
                 title = translate_to_malayalam(title)
                 instructions = translate_to_malayalam(instructions)
@@ -158,8 +137,7 @@ if st.button("📤 Send") and ingredients:
             st.markdown(f"<div class='bot-box'><b>🤖 BOT:</b><br>{bot_reply}</div>", unsafe_allow_html=True)
             st.markdown("</div>", unsafe_allow_html=True)
 
-            speak_text(f"{title}. {instructions}", lang=speak_lang)
-
+            # Save to DB
             cursor.execute("INSERT INTO recipes (ingredients, recipe) VALUES (?, ?)", (ingredients, title + ": " + instructions))
             conn.commit()
         else:
