@@ -145,7 +145,7 @@ img {
 """, unsafe_allow_html=True)
 
 # Title
-st.markdown("<div class='title-animated'>🍲 PACHAKAPURA</div>", unsafe_allow_html=True)
+st.markdown("<div class='title-animated'>PACHAKAPURA</div>", unsafe_allow_html=True)
 st.markdown("Enter the ingredients you have, and I’ll suggest a recipe for you!")
 
 # Input
