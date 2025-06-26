@@ -132,7 +132,7 @@ img {
 """, unsafe_allow_html=True)
 
 # Title
-st.markdown("<div class='title-animated'>🍴 Adipoli RecipeBot</div>", unsafe_allow_html=True)
+st.markdown("<div class='title-animated'>🍴 PACHAKAPURA</div>", unsafe_allow_html=True)
 st.markdown("Enter the ingredients you have, and I’ll suggest a recipe for you!")
 
 # Input
@@ -155,7 +155,7 @@ if st.button("📤 Send") and ingredients:
             if image_url:
                 bot_reply += f"<img src='{image_url}' width='100%'><br>"
             bot_reply += f"{instructions}"
-            st.markdown(f"<div class='bot-box'><b>🤖 AdipoliBot:</b><br>{bot_reply}</div>", unsafe_allow_html=True)
+            st.markdown(f"<div class='bot-box'><b>🤖 Bot:</b><br>{bot_reply}</div>", unsafe_allow_html=True)
             st.markdown("</div>", unsafe_allow_html=True)
 
             speak_text(f"{title}. {instructions}", lang=speak_lang)
@@ -171,3 +171,6 @@ if st.checkbox("📜 Show previous recipes"):
     rows = cursor.execute("SELECT ingredients, recipe, date FROM recipes ORDER BY id DESC LIMIT 5").fetchall()
     for ingredients, recipe, date in rows:
         st.markdown(f"<div class='bot-box'><b>{date}</b><br><b>You:</b> {ingredients}<br><b>Recipe:</b> {recipe}</div>", unsafe_allow_html=True)
+
+st.markdown("<div style='text-align:center; color:#666; margin-top: 30px;'>© 2025 | Published by Aju Krishna</div>", unsafe_allow_html=True)
+st.markdown("</div>", unsafe_allow_html=True)
