@@ -2,3 +2,4 @@ streamlit
 requests
 deep-translator
 gTTS
+sqlite3
