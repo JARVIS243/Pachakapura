@@ -1,7 +1,6 @@
 import streamlit as st
 import requests
 import sqlite3
-from datetime import datetime
 from deep_translator import GoogleTranslator
 from gtts import gTTS
 import tempfile
@@ -18,7 +17,6 @@ cursor.execute('''CREATE TABLE IF NOT EXISTS recipes (
 )''')
 conn.commit()
 
-# Spoonacular API key
 API_KEY = "9714989c384a4a5595583c53c90db947"
 
 def fetch_recipe_from_spoonacular(ingredients):
@@ -57,7 +55,7 @@ def speak_text(text, lang='en'):
         with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as fp:
             tts.save(fp.name)
             audio_path = fp.name
-        
+
         with open(audio_path, "rb") as f:
             audio_bytes = f.read()
         b64_audio = base64.b64encode(audio_bytes).decode()
@@ -71,7 +69,6 @@ def speak_text(text, lang='en'):
     except Exception as e:
         st.error(f"Voice error: {e}")
 
-# Streamlit UI
 st.set_page_config(page_title="Pachakapura", layout="centered")
 
 st.markdown("""
