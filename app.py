@@ -150,7 +150,7 @@ st.markdown("Enter the ingredients you have, and I’ll suggest a recipe for you
 
 # Input
 language = st.selectbox("🌐 Choose Language", ["English", "Malayalam"])
-ingredients = st.text_input("🍅 Ingredients (comma-separated)")
+raw_ingredients = st.text_input("🍅 Ingredients (comma-separated)")
 ingredients = ','.join(i.strip().lower() for i in raw_ingredients.split(',') if i.strip())
 
 # Button
