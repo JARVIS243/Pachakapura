@@ -5,7 +5,7 @@ from datetime import datetime
 from deep_translator import GoogleTranslator
 from gtts import gTTS
 import tempfile
-from playsound import playsound
+import base64
 
 # Database setup
 conn = sqlite3.connect('recipes.db', check_same_thread=False)
@@ -19,7 +19,7 @@ cursor.execute('''CREATE TABLE IF NOT EXISTS recipes (
 conn.commit()
 
 # Spoonacular API key
-API_KEY = "9714989c384a4a5595583c53c90db947"
+API_KEY = "9714989c384a4a5595583c90db947"
 
 # Recipe fetch function
 def fetch_recipe_from_spoonacular(ingredients):
@@ -55,18 +55,31 @@ def translate_to_malayalam(text):
         print("Translation error:", e)
         return text
 
-# Voice function
+# Voice function with HTML audio player (for Streamlit Cloud)
 def speak_text(text, lang='en'):
     try:
         tts = gTTS(text=text, lang=lang)
-        with tempfile.NamedTemporaryFile(delete=True, suffix='.mp3') as fp:
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as fp:
             tts.save(fp.name)
-            playsound(fp.name)
+            audio_path = fp.name
+
+        with open(audio_path, "rb") as audio_file:
+            audio_bytes = audio_file.read()
+            b64 = base64.b64encode(audio_bytes).decode()
+
+        audio_html = f"""
+            <audio autoplay>
+                <source src="data:audio/mp3;base64,{b64}" type="audio/mp3">
+                Your browser does not support the audio element.
+            </audio>
+        """
+        st.markdown(audio_html, unsafe_allow_html=True)
+
     except Exception as e:
-        print("Voice error:", e)
+        st.error(f"Voice error: {e}")
 
 # Streamlit UI
-st.set_page_config(page_title="Adipoli RecipeBot", layout="centered")
+st.set_page_config(page_title="Pachakapura", layout="centered")
 
 # Style
 st.markdown("""
@@ -132,7 +145,7 @@ img {
 """, unsafe_allow_html=True)
 
 # Title
-st.markdown("<div class='title-animated'>🍴 PACHAKAPURA</div>", unsafe_allow_html=True)
+st.markdown("<div class='title-animated'>🍲 PACHAKAPURA</div>", unsafe_allow_html=True)
 st.markdown("Enter the ingredients you have, and I’ll suggest a recipe for you!")
 
 # Input
@@ -155,7 +168,7 @@ if st.button("📤 Send") and ingredients:
             if image_url:
                 bot_reply += f"<img src='{image_url}' width='100%'><br>"
             bot_reply += f"{instructions}"
-            st.markdown(f"<div class='bot-box'><b>🤖 Bot:</b><br>{bot_reply}</div>", unsafe_allow_html=True)
+            st.markdown(f"<div class='bot-box'><b>🤖 BOT:</b><br>{bot_reply}</div>", unsafe_allow_html=True)
             st.markdown("</div>", unsafe_allow_html=True)
 
             speak_text(f"{title}. {instructions}", lang=speak_lang)
