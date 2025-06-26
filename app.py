@@ -113,7 +113,7 @@ img {
 </style>
 """, unsafe_allow_html=True)
 
-st.markdown("<div class='title-animated'>PACHAKAPURA</div>", unsafe_allow_html=True)
+st.markdown("<div class='title-animated'> 🍴 PACHAKAPURA</div>", unsafe_allow_html=True)
 st.markdown("Enter the ingredients you have, and I’ll suggest a recipe for you!")
 
 language = st.selectbox("🌐 Choose Language", ["English", "Malayalam"])
