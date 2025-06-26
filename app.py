@@ -19,9 +19,8 @@ cursor.execute('''CREATE TABLE IF NOT EXISTS recipes (
 conn.commit()
 
 # Spoonacular API key
-API_KEY = "9714989c384a4a5595583c90db947"
+API_KEY = "9714989c384a4a5595583c53c90db947"
 
-# Recipe fetch function
 def fetch_recipe_from_spoonacular(ingredients):
     base_url = "https://api.spoonacular.com/recipes/findByIngredients"
     info_url = "https://api.spoonacular.com/recipes/{id}/information"
@@ -32,11 +31,9 @@ def fetch_recipe_from_spoonacular(ingredients):
             "number": 1,
             "apiKey": API_KEY
         })
-
         if response.status_code == 200 and response.json():
             recipe_data = response.json()[0]
             recipe_id = recipe_data["id"]
-
             full_info = requests.get(info_url.format(id=recipe_id), params={"apiKey": API_KEY}).json()
             title = full_info.get("title", "Unknown Recipe")
             instructions = full_info.get("instructions", "Instructions not available.")
@@ -47,7 +44,6 @@ def fetch_recipe_from_spoonacular(ingredients):
     except Exception as e:
         return None, f"Error: {e}", None
 
-# Translation function
 def translate_to_malayalam(text):
     try:
         return GoogleTranslator(source='auto', target='ml').translate(text)
@@ -55,33 +51,29 @@ def translate_to_malayalam(text):
         print("Translation error:", e)
         return text
 
-# Voice function with HTML audio player (for Streamlit Cloud)
 def speak_text(text, lang='en'):
     try:
         tts = gTTS(text=text, lang=lang)
         with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as fp:
             tts.save(fp.name)
             audio_path = fp.name
-
-        with open(audio_path, "rb") as audio_file:
-            audio_bytes = audio_file.read()
-            b64 = base64.b64encode(audio_bytes).decode()
-
+        
+        with open(audio_path, "rb") as f:
+            audio_bytes = f.read()
+        b64_audio = base64.b64encode(audio_bytes).decode()
         audio_html = f"""
-            <audio autoplay>
-                <source src="data:audio/mp3;base64,{b64}" type="audio/mp3">
+            <audio autoplay controls>
+                <source src="data:audio/mp3;base64,{b64_audio}" type="audio/mp3">
                 Your browser does not support the audio element.
             </audio>
         """
         st.markdown(audio_html, unsafe_allow_html=True)
-
     except Exception as e:
         st.error(f"Voice error: {e}")
 
 # Streamlit UI
 st.set_page_config(page_title="Pachakapura", layout="centered")
 
-# Style
 st.markdown("""
 <style>
 .title-animated {
@@ -144,16 +136,13 @@ img {
 </style>
 """, unsafe_allow_html=True)
 
-# Title
 st.markdown("<div class='title-animated'>PACHAKAPURA</div>", unsafe_allow_html=True)
 st.markdown("Enter the ingredients you have, and I’ll suggest a recipe for you!")
 
-# Input
 language = st.selectbox("🌐 Choose Language", ["English", "Malayalam"])
 raw_ingredients = st.text_input("🍅 Ingredients (comma-separated)")
 ingredients = ','.join(i.strip().lower() for i in raw_ingredients.split(',') if i.strip())
 
-# Button
 if st.button("📤 Send") and ingredients:
     with st.spinner("Typing..."):
         title, instructions, image_url = fetch_recipe_from_spoonacular(ingredients)
@@ -179,7 +168,6 @@ if st.button("📤 Send") and ingredients:
         else:
             st.warning(instructions)
 
-# History
 if st.checkbox("📜 Show previous recipes"):
     st.markdown("### 🕒 Recipe History")
     rows = cursor.execute("SELECT ingredients, recipe, date FROM recipes ORDER BY id DESC LIMIT 5").fetchall()
@@ -187,4 +175,3 @@ if st.checkbox("📜 Show previous recipes"):
         st.markdown(f"<div class='bot-box'><b>{date}</b><br><b>You:</b> {ingredients}<br><b>Recipe:</b> {recipe}</div>", unsafe_allow_html=True)
 
 st.markdown("<div style='text-align:center; color:#666; margin-top: 30px;'>© 2025 | Published by Aju Krishna</div>", unsafe_allow_html=True)
-st.markdown("</div>", unsafe_allow_html=True)
